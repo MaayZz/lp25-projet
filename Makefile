@@ -1,41 +1,90 @@
-CC      = gcc
-CFLAGS  = -Wall -Wextra -Werror -std=c11 -Iinclude
-LDFLAGS = -lncurses
+# Makefile pour le projet LP25 - Moniteur de processus
+# Auteur: Groupe LP25
+# Description: Compilation modulaire du projet
 
-SRC_DIR = src
-OBJ_DIR = obj
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -g -O2
+LIBS = -lncurses
+TARGET = my_htop_local
 
-SRCS = \
-	$(SRC_DIR)/main.c \
-	$(SRC_DIR)/manager.c \
-	$(SRC_DIR)/process.c \
-	$(SRC_DIR)/network.c \
-	$(SRC_DIR)/ui.c \
-	$(SRC_DIR)/config.c \
-	$(SRC_DIR)/utils.c
+# Fichiers sources et objets
+SRCS = main.c manager.c process.c ui.c
+OBJS = $(SRCS:.c=.o)
+HEADERS = manager.h process.h ui.h
 
-OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-
-TARGET = lp25
-
-.PHONY: all clean fclean re debug
-
+# Règle par défaut
 all: $(TARGET)
 
+# Règle pour lier l'exécutable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	@echo "Linking $(TARGET)..."
+	$(CC) $(OBJS) $(LIBS) -o $(TARGET)
+	@echo "Compilation reussie!"
+	@echo "Executez avec: ./$(TARGET) ou sudo ./$(TARGET)"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(OBJ_DIR)
+# Règle pour compiler les fichiers sources
+%.o: %.c $(HEADERS)
+	@echo "Compiling $<..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-debug: CFLAGS += -g
-debug: re
-
+# Nettoyage des fichiers objets
 clean:
-	rm -rf $(OBJ_DIR)
+	@echo "Nettoyage des fichiers objets..."
+	rm -f $(OBJS)
 
+# Nettoyage complet
 fclean: clean
+	@echo "Suppression de l'executable..."
 	rm -f $(TARGET)
 
+# Recompilation complète
 re: fclean all
+
+# Test avec dry-run
+test-dry-run: $(TARGET)
+	@echo "Test en mode dry-run..."
+	./$(TARGET) --dry-run
+
+# Lancement normal
+run: $(TARGET)
+	@echo "Lancement de $(TARGET)..."
+	@echo "Note: Utilisez sudo pour les actions kill/pause/continue"
+	./$(TARGET)
+
+# Lancement avec sudo
+run-sudo: $(TARGET)
+	@echo "Lancement de $(TARGET) avec droits root..."
+	sudo ./$(TARGET)
+
+# Vérification des fuites mémoire avec valgrind
+valgrind: $(TARGET)
+	@echo "Verification des fuites memoire avec valgrind..."
+	@echo "Appuyez sur 'q' rapidement pour quitter"
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET)
+
+# Aide
+help:
+	@echo "=========================================="
+	@echo "Makefile du projet LP25"
+	@echo "=========================================="
+	@echo ""
+	@echo "Cibles disponibles:"
+	@echo "  make              - Compile le projet"
+	@echo "  make all          - Identique a make"
+	@echo "  make clean        - Supprime les fichiers objets"
+	@echo "  make fclean       - Supprime tout (objets + executable)"
+	@echo "  make re           - Recompile depuis zero"
+	@echo "  make run          - Compile et lance le programme"
+	@echo "  make run-sudo     - Compile et lance avec sudo"
+	@echo "  make test-dry-run - Test l'acces aux processus"
+	@echo "  make valgrind     - Verifie les fuites memoire"
+	@echo "  make help         - Affiche cette aide"
+	@echo ""
+	@echo "Structure du projet:"
+	@echo "  main.c     - Point d'entree et gestion des arguments"
+	@echo "  manager.c  - Orchestration et logique metier"
+	@echo "  process.c  - Gestion des processus Linux"
+	@echo "  ui.c       - Interface utilisateur avec ncurses"
+	@echo ""
+
+.PHONY: all clean fclean re test-dry-run run run-sudo valgrind help
