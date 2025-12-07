@@ -1,7 +1,7 @@
 /**
  * @file process.c
  * @brief Implémentation du module de gestion des processus
- * @author Groupe LP25
+ * @author Abir Islam, Mellouk Mohamed-Amine, Issam Fallani
  */
 
 #define _POSIX_C_SOURCE 200809L
@@ -17,7 +17,6 @@
 #include <signal.h>
 #include <unistd.h>
 
-/* Fonctions internes */
 
 /**
  * @brief Ajoute un processus en tête de liste.
@@ -70,7 +69,7 @@ static int lire_infos_processus(pid_t pid, processus_t *proc_data) {
         return -1;
     }
 
-    /* Lecture des champs depuis /proc/[PID]/stat */
+    // Lecture des champs depuis /proc/[PID]/stat
     int fields_read = fscanf(file, "%d %s %c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lld %lld %*d %*d %*d %*d %*d %*d %ld %ld",
                &proc_data->pid, proc_data->nom_commande, &proc_data->etat,
                &proc_data->utime, &proc_data->stime, 
@@ -82,7 +81,7 @@ static int lire_infos_processus(pid_t pid, processus_t *proc_data) {
         return -1;
     }
     
-    /* Nettoyage du nom de commande (enlever les parenthèses) */
+    // Nettoyage du nom de commande (enlever les parenthèses)
     size_t len = strlen(proc_data->nom_commande);
     if (proc_data->nom_commande[0] == '(' && proc_data->nom_commande[len - 1] == ')') {
         proc_data->nom_commande[len - 1] = '\0';
@@ -91,14 +90,13 @@ static int lire_infos_processus(pid_t pid, processus_t *proc_data) {
     
     get_username_from_pid(pid, proc_data->utilisateur, MAX_USER_LEN);
     
-    /* Calcul simple du pourcentage CPU */
+    // Calcul du pourcentage CPU
     long long total_time = proc_data->utime + proc_data->stime;
     proc_data->cpu_percent = (float)total_time / 100.0;
     
     return 0;
 }
 
-/* Fonctions publiques */
 
 processus_t *recuperer_processus_locaux(void) {
     DIR *dir;
@@ -111,7 +109,7 @@ processus_t *recuperer_processus_locaux(void) {
     }
 
     while ((entree = readdir(dir)) != NULL) {
-        /* Vérifier si l'entrée est un PID */
+        // Vérifier si l'entrée est un PID
         int est_pid = 1;
         char *p;
         for (p = entree->d_name; *p; p++) {

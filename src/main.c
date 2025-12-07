@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @brief Point d'entrée principal du programme
- * @author Groupe LP25
+ * @author Abir Islam, Mellouk Mohamed-Amine, Issam Fallani
  * 
  * Ce fichier contient le main() et la gestion des arguments en ligne de commande.
  * Pour le moment, seul le mode local est implémenté.
@@ -89,12 +89,12 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    /* Mode local par défaut */
+    // Mode local par défaut
     manager_init(&manager_state);
     retour = manager_run_local(&manager_state);
     manager_cleanup(&manager_state);
     
-    /* Message de fin */
+    // Message de fin
     printf("\n========================================\n");
     printf("  MY_HTOP termine proprement\n");
     printf("  Cycles d'actualisation: %d\n", manager_state.cycles);

@@ -1,7 +1,7 @@
 /**
  * @file process.h
  * @brief Module de gestion des processus sur une machine Linux
- * @author Groupe LP25
+ * @author Abir Islam, Mellouk Mohamed-Amine, Issam Fallani
  * 
  * Ce module implémente les fonctionnalités de lecture, manipulation
  * et gestion des processus via le système de fichiers /proc.
