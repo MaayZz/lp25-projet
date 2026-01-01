@@ -4,13 +4,13 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g -O2
-LIBS = -lncurses
-TARGET = my_htop_local
+LIBS = -lncurses -lssh
+TARGET = my_htop
 
 # Fichiers sources et objets
-SRCS = main.c manager.c process.c ui.c
+SRCS = main.c manager.c process.c ui.c network.c
 OBJS = $(SRCS:.c=.o)
-HEADERS = manager.h process.h ui.h
+HEADERS = manager.h process.h ui.h network.h
 
 # Règle par défaut
 all: $(TARGET)

@@ -2,7 +2,7 @@
  * @file ui.h
  * @brief Module de gestion de l'affichage et de l'interface utilisateur
  * @author Abir Islam, Mellouk Mohamed-Amine, Issam Fallani
- * 
+ *
  * Ce module implémente les fonctionnalités d'affichage des processus
  * et de gestion des événements clavier avec ncurses.
  */
@@ -13,9 +13,12 @@
 #include "process.h"
 #include <time.h>
 
+/* Forward declaration */
+typedef struct machine_info machine_info_t;
 
 #define REFRESH_TIMEOUT 100
-#define MESSAGE_DISPLAY_DURATION 5 //Durée d'affichage des messages d'action (peut etre modifié)
+#define MESSAGE_DISPLAY_DURATION                                               \
+  5 // Durée d'affichage des messages d'action (peut etre modifié)
 
 // Codes de retour pour les actions utilisateur
 #define ACTION_CONTINUE 1
@@ -27,19 +30,24 @@
 #define ACTION_FORCE_KILL 6
 #define ACTION_RESTART 7
 #define ACTION_SEARCH 8
+#define ACTION_NEXT_TAB 9
+#define ACTION_PREV_TAB 10
 
 /**
  * @brief Structure pour stocker l'état de l'interface.
  */
 typedef struct ui_state {
-    int selected_index;
-    int scroll_offset;
-    char message_buffer[256];
-    int message_type;  /* 0: info, 1: erreur */
-    int show_help;     /* 1 si fenêtre d'aide affichée */
-    time_t message_time;  /* Timestamp du message pour durée d'affichage */
-} ui_state_t;
+  int selected_index;
+  int scroll_offset;
+  char message_buffer[256];
+  int message_type;    /* 0: info, 1: erreur */
+  int show_help;       /* 1 si fenêtre d'aide affichée */
+  time_t message_time; /* Timestamp du message pour durée d'affichage */
 
+  /* Pour mode réseau */
+  int nb_machines;      /* Nombre total de machines */
+  int machine_courante; /* Index de la machine courante */
+} ui_state_t;
 
 /**
  * @brief Initialise l'environnement ncurses.
@@ -57,6 +65,16 @@ void ui_cleanup(void);
  * @param state : État de l'interface (sélection, scroll, messages).
  */
 void ui_afficher_processus(processus_t *head, ui_state_t *state);
+
+/**
+ * @brief Affiche l'interface avec onglets pour mode réseau.
+ * @param machines : Tableau des machines.
+ * @param nb_machines : Nombre de machines.
+ * @param machine_courante : Index de la machine courante.
+ * @param state : État de l'interface.
+ */
+void ui_afficher_processus_network(machine_info_t *machines, int nb_machines,
+                                   int machine_courante, ui_state_t *state);
 
 /**
  * @brief Affiche la fenêtre d'aide.
