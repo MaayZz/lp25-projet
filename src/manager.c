@@ -189,8 +189,40 @@ int manager_run_local(manager_state_t *state) {
     } else if (action == ACTION_HELP) {
       ui_afficher_aide();
     } else if (action == ACTION_SEARCH) {
-      ui_afficher_message(&state->ui_state,
-                          "Fonction recherche non implementee", 0);
+      char search_buffer[256];
+      if (ui_demander_saisie(&state->ui_state, "Rechercher (PID ou nom): ",
+                             search_buffer, sizeof(search_buffer))) {
+        int found = 0;
+        int search_pid = atoi(search_buffer);
+        processus_t *curr = state->liste_processus;
+        int index = 0;
+
+        while (curr != NULL) {
+          /* Recherche par PID ou nom de commande */
+          if ((search_pid > 0 && curr->pid == search_pid) ||
+              strcasecmp(curr->nom_commande, search_buffer) == 0 ||
+              strstr(curr->nom_commande, search_buffer) != NULL) {
+            state->ui_state.selected_index = index;
+            /* Ajuster le scroll pour que le résultat soit visible */
+            int max_visible = LINES - 8;
+            if (index < state->ui_state.scroll_offset ||
+                index >= state->ui_state.scroll_offset + max_visible) {
+              state->ui_state.scroll_offset = index - (max_visible / 2);
+              if (state->ui_state.scroll_offset < 0)
+                state->ui_state.scroll_offset = 0;
+            }
+            found = 1;
+            ui_afficher_message(&state->ui_state, "Processus trouve", 0);
+            break;
+          }
+          curr = curr->suivant;
+          index++;
+        }
+
+        if (!found) {
+          ui_afficher_message(&state->ui_state, "Processus non trouve", 1);
+        }
+      }
     } else if (action == ACTION_KILL || action == ACTION_PAUSE ||
                action == ACTION_CONTINUE_SIGNAL ||
                action == ACTION_FORCE_KILL) {
@@ -356,8 +388,40 @@ int manager_run_network(manager_state_t *state, network_config_t *config,
                state->machines[state->machine_courante].nom);
       ui_afficher_message(&state->ui_state, msg, 0);
     } else if (action == ACTION_SEARCH) {
-      ui_afficher_message(&state->ui_state,
-                          "Fonction recherche non implementee", 0);
+      char search_buffer[256];
+      if (ui_demander_saisie(&state->ui_state, "Rechercher (PID ou nom): ",
+                             search_buffer, sizeof(search_buffer))) {
+        int found = 0;
+        int search_pid = atoi(search_buffer);
+        processus_t *curr = machine_active->liste_processus;
+        int index = 0;
+
+        while (curr != NULL) {
+          /* Recherche par PID ou nom de commande */
+          if ((search_pid > 0 && curr->pid == search_pid) ||
+              strcasecmp(curr->nom_commande, search_buffer) == 0 ||
+              strstr(curr->nom_commande, search_buffer) != NULL) {
+            state->ui_state.selected_index = index;
+            /* Ajuster le scroll pour que le résultat soit visible */
+            int max_visible = LINES - 8;
+            if (index < state->ui_state.scroll_offset ||
+                index >= state->ui_state.scroll_offset + max_visible) {
+              state->ui_state.scroll_offset = index - (max_visible / 2);
+              if (state->ui_state.scroll_offset < 0)
+                state->ui_state.scroll_offset = 0;
+            }
+            found = 1;
+            ui_afficher_message(&state->ui_state, "Processus trouve", 0);
+            break;
+          }
+          curr = curr->suivant;
+          index++;
+        }
+
+        if (!found) {
+          ui_afficher_message(&state->ui_state, "Processus non trouve", 1);
+        }
+      }
     } else if (action == ACTION_KILL || action == ACTION_PAUSE ||
                action == ACTION_CONTINUE_SIGNAL ||
                action == ACTION_FORCE_KILL) {

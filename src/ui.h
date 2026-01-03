@@ -90,6 +90,17 @@ void ui_afficher_aide(void);
 void ui_afficher_message(ui_state_t *state, const char *msg, int type);
 
 /**
+ * @brief Demande une saisie à l'utilisateur en bas de l'écran.
+ * @param state : État de l'interface.
+ * @param prompt : Message d'invite.
+ * @param buffer : Buffer pour stocker la saisie.
+ * @param max_len : Taille maximale du buffer.
+ * @return int : 1 si une saisie a été faite, 0 si annulé.
+ */
+int ui_demander_saisie(ui_state_t *state, const char *prompt, char *buffer,
+                       int max_len);
+
+/**
  * @brief Gère les événements clavier et la navigation.
  * @param state : État de l'interface.
  * @param nb_processus : Nombre total de processus.

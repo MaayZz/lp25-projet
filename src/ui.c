@@ -234,6 +234,38 @@ void ui_afficher_processus(processus_t *head, ui_state_t *state) {
   }
 }
 
+int ui_demander_saisie(ui_state_t *state, const char *prompt, char *buffer,
+                       int max_len) {
+  int ret = 0;
+
+  /* Effacer la ligne de message */
+  move(LINES - 1, 0);
+  clrtoeol();
+
+  /* Afficher le prompt */
+  attron(COLOR_PAIR(COLOR_INFO_MSG) | A_BOLD);
+  mvprintw(LINES - 1, 2, "%s", prompt);
+  attroff(COLOR_PAIR(COLOR_INFO_MSG) | A_BOLD);
+  refresh();
+
+  /* Activer l'écho et le curseur temporairement */
+  echo();
+  curs_set(1);
+
+  /* Saisie */
+  if (getnstr(buffer, max_len - 1) == OK) {
+    if (strlen(buffer) > 0) {
+      ret = 1;
+    }
+  }
+
+  /* Restaurer l'état */
+  noecho();
+  curs_set(0);
+
+  return ret;
+}
+
 int ui_gerer_evenements(ui_state_t *state, int nb_processus) {
   int key_input = getch();
   int max_visible = LINES - 8;
